@@ -1,0 +1,107 @@
+https://codeburst.io/build-a-weather-website-in-30-minutes-with-node-js-express-openweather-a317f904897b
+
+1) Create account OpenWeatherMap API https://openweathermap.org/
+2) Generate API key 0ea2e38e26ca69e9c79045f9402ff3a3
+3) npm init -> create index.js
+4) To make API call use npm module called 'request' https://www.npmjs.com/package/request :
+    > npm install request --save
+
+    P.S. request is deprecated. Instead use 'axious' or 'node-fetch' or any other module.
+5) starter code
+    const request = require('request');
+    request(url, function (err, response, body) {
+        if(err){
+            console.log('error:', error);
+        } else {
+            console.log('body:', body);
+        }
+    });
+6) From OpenWeatherMap Documentation: 
+    url: http://api.openweathermap.org/data/2.5/weather
+    query parameters: city and API key
+
+    So, insert code:
+    let apiKey = '****************************';
+    let city = 'portland';
+    let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`
+7) Run code in console: 
+    > node index.js
+8) Convert JSON into a JavaScript Object. 
+    let weather = JSON.parse(body)
+9) Access data within the object with dot or bracket notation. 
+    let message = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+    console.log(message);
+10) If you use Celsius you’d add: units=metric and 
+    if you use Fahrenheit you’d use units=imperial.
+--------------------------------------------------------------------------------
+Go from a console application to a fully-functioning website.
+11) Create server.js
+    To get our server up and running use Express https://expressjs.com/
+    > npm install express --save
+
+    Copy boilerplate Express starter app: 
+    const express = require('express')
+    const app = express()
+
+    app.get('/', function (req, res) {
+        res.send('Hello World!')
+    })
+
+    app.listen(3000, function () {
+        console.log('Example app listening on port 3000!')
+    })
+12) For Embedded JS in html use 'template engine'. Install ejs:
+    > npm install ejs --save
+
+    Add to server.js:
+    app.set('view engine', 'ejs')
+
+    EJS is accessed by default in the views directory. Create /views/index.ejs (our HTML file)
+13) Change code inside app.get to 
+        res.render('index');
+14) test our server:
+    > node server.js
+15) CSS: create /public/css/style.css
+    Express wont allow access to this file by default, so we need to expose it with the following line of code:
+        app.use(express.static('public'));
+16) Setting up our POST Route:
+    app.post('/', function(req, res) {
+        res.render('index');
+    });
+    But instead of just responding with the same html template, lets access the name of the city the user typed in as well. 
+    For this we need to use an Express Middleware ((functions that have access to the req and res bodies, in order to preform more advanced tasks).
+    -> body-parser middleware - allows us to make use of the key-value pairs stored on the req.body object.
+    > npm install body-parser --save
+    const bodyParser = require('body-parser');
+    // ...
+    // ...
+    app.use(bodyParser.urlencoded({ extended: true }));
+    
+    Update our post request to log the value of ‘city’ to the console.
+    app.post('/', function (req, res) {
+        res.render('index');
+        console.log(req.body.city);
+    })
+17) Update app.post
+    app.post('/', function(req, res) {
+        let city = req.body.city;
+        let url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${apiKey}`;
+        request(url, function(err, response, body) {
+            if (err) {
+                res.render('index', { weather: null, error: 'Error, please try again' });
+            } else {
+                let weather = JSON.parse(body);
+                if (weather.main == undefined) {
+                    res.render('index', { weather: null, error: 'Error, please try again' });
+                } else {
+                    let weatherText = `It's ${weather.main.temp} degrees in ${weather.name}!`;
+                    res.render('index', { weather: weatherText, error: null });
+                }
+            }
+        });
+    });
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+https://codepen.io/freeCodeCamp/pen/bELRjV
+https://www.freecodecamp.org/news/building-a-weather-app-a3cec42b11fa/

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Test</title>
+        <link rel="stylesheet" type="text/css" href="/css/style.css" />
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans:300"
+            rel="stylesheet"
+            type="text/css"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Weather App</h1>
+            <!-- <button id="find-me">Show my location</button><br /> -->
+            <p id="status"></p>
+            <a id="map-link" target="_blank"></a>
+
+            <p id="city"></p>
+            <p id="temp"></p>
+            <p id="weatherMain"></p>
+            <fieldset>
+                <form action="/" method="post">
+                    <input
+                        name="city"
+                        type="text"
+                        class="ghost-input"
+                        placeholder="Enter a City"
+                        required
+                    />
+                    <input type="submit" class="ghost-button" value="Get Weather" />
+                </form>
+                <!-- Make use of all those variables we sent back with our res.render call. These variables aren’t available on the client, this is where we finally get to use EJS. -->
+                <% if(weather !== null){ %>
+                <p><%= weather %></p>
+                <% } %> <% if(error !== null){ %>
+                <p><%= error %></p>
+                <% } %>
+            </fieldset>
+        </div>
+        <script
+            type="text/javascript"
+            src="http://maps.googleapis.com/maps/api/js?sensor=false"
+        ></script>
+        <script>
+            // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API
+            function geoFindMe() {
+                const status = document.querySelector('#status');
+                const mapLink = document.querySelector('#map-link');
+                mapLink.href = '';
+                mapLink.textContent = '';
+                function success(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    status.textContent = '';
+                    mapLink.href = `https://www.openstreetmap.org/#map=18/${lat}/${lng}`;
+                    mapLink.textContent = `**Latitude: ${lat} °, Longitude: ${lng} °`;
+                    // codeLatLng(lat, lng);
+                    getWeather(lat, lng);
+                }
+                function error() {
+                    status.textContent = 'Unable to retrieve your location';
+                }
+                function getWeather(lat, lng) {
+                    var urlString = `https://www.openstreetmap.org/#map=18/${lat}/${lng}`;
+                    var request = new XMLHttpRequest();
+
+                    // Instantiating the request object
+                    request.open('GET', urlString);
+
+                    // Defining event listener for readystatechange event
+                    request.onreadystatechange = function() {
+                        // Check if the request is compete and was successful
+                        if (this.readyState === 4 && this.status === 200) {
+                            // Inserting the response from server into an HTML element
+                            document.getElementById('#city').textContent = result.name;
+
+                        }
+                    };
+
+                    // Sending the request to the server
+                    request.send();
+
+                if (!navigator.geolocation) {
+                    status.textContent = 'Geolocation is not supported by your browser';
+                } else {
+                    // status.textContent = 'Locating…';
+                    navigator.geolocation.getCurrentPosition(success, error);
+                }
+            }
+
+            window.addEventListener('load', geoFindMe);
+            // window.addEventListener('load', initialize);
+        </script>
+    </body>
+</html>

@@ -1,0 +1,139 @@
+//--------------------- console application --------------------- 
+> npm init
+> npm install axios      // instead of 'request' npm module.
+Add starter code from axios documentation to index.js.
+
+//--------------------- fully-functioning website --------------------- 
+Resource: https://github.com/SukhjinderArora/weather-app/blob/master/package.json
+
+WEBPACK
+> npm init
+> npm install webpack webpack-cli --save-dev    
+> npm i webpack-dev-server --save-dev 
+    https://webpack.js.org/guides/development/#using-webpack-dev-server
+    https://medium.com/a-beginners-guide-for-webpack-2/webpack-dev-server-wds-5a1108ba9ec6
+
+INSTALL PACKAGES
+## Misc packages:
+    - axios                         Promise based HTTP client for the browser and node.js.
+    - @babel/polyfill               Provides polyfills necessary for a full ES2015+ environment
+    - cssnano                       A modular minifier, built on top of the PostCSS ecosystem.
+    - eslint                        tool for identifying and reporting on patterns found in ECMAScript/JavaScript code.
+    - eslint-config-airbnb-base
+    - gh-pages                      Publish files to a gh-pages branch on GitHub (or any other branch anywhere else).
+    - node-sass                     library that provides binding for Node.js to LibSass, the C version of the popular stylesheet preprocessor, Sass.
+    - npm-run-all                   A CLI tool to run multiple npm-scripts in parallel or sequential.
+    
+    - @babel/preset-env             A Babel preset for each environment.
+    - postcss-preset-env            lets you convert modern CSS into something most browsers can understand
+    - cross-env                     Run scripts that set and use environment variables across platforms
+## Webpack Plugins:
+    - html-webpack-plugin           Simplifies creation of HTML files.
+        https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474
+    - mini-css-extract-plugin       Lightweight CSS extraction plugin 
+        https://blog.jakoblind.no/css-modules-webpack/
+    - eslint-plugin-import          A ESLint plugin for webpack .
+    - clean-webpack-plugin          A webpack plugin to remove your build folder(s) before building
+        to remove/update 'dist' folder 
+## Loaders:
+    [styles]
+    - style-loader                  Style loader module for Webpack.
+    - sass-loader                   SASS loader for Webpack. 
+    - postcss-loader                PostCSS loader for Webpack.
+    - css-loader                    CSS loader module for Webpack.
+    [file type]
+    - file-loader                   File loader module for Webpack.
+    - html-loader                   HTML loader module for Webpack. 
+    [utility]
+    - babel-loader                  Webpack plugin for Babel.
+## Integration Libraries
+    - dotenv-webpack                Compiles environment variables into your bundle via dotenv.
+
+## Add scripts to package.json:
+    // "build": "webpack"
+    // "start": "webpack-dev-server --open"
+    "dev": "webpack --mode development",
+    "prod": "webpack --mode production",
+    "start": "webpack-dev-server --mode development --open --hot",
+
+## Setup a file webpack.config.js
+    const path = require('path');
+
+    module.exports = {
+        entry: ['./src/js/index.js'],
+        output: {
+            path: path.resolve(__dirname, 'dist'),
+            filename: 'bundle.js'
+        },
+        devServer: {
+            contentBase: path.join(__dirname, 'src')
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.css$/,
+                    use: ['css-loader', 'postcss-loader']
+                },
+                {
+                    test: /\.(html)$/,
+                    use: {
+                        loader: 'html-loader',
+                        options: {
+                            attrs: ['img:src', 'object:data', 'link:href', 'a:href']
+                            // minimize: !devMode
+                        }
+                    }
+                },
+                {
+                    test: /\.(png|svg|jpe?g|gif|ico)$/,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: '[name].[ext]',
+                                emitFile: true,
+                                outputPath: 'images',
+                                publicPath: 'images'
+                            }
+                        }
+                    ]
+                },
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    use: 'babel-loader'
+                }
+            ]
+        }
+    };
+
+## Add html in index.html
+    <body>
+        <div class="container">
+            <header class="heading">
+              ...
+            </header>
+            <form action="#" class="form">
+              ...
+            </form>
+            <div class="weather-container">
+    </body>
+
+## how to link css file to html in webpack 
+    https://medium.com/a-beginners-guide-for-webpack-2/webpack-loaders-css-and-sass-2cc0079b5b3a
+    if you use sass: https://medium.com/a-beginners-guide-for-webpack-2/using-sass-9f52e447c5ae
+    > npm install sass-loader node-sass --save-dev
+
+## Animated SVG weather icons https://www.amcharts.com/free-animated-svg-weather-icons/
+
+## JS npm packages: 
+    - axios
+    - @babel/polyfill
+
+## API_KEY - process.env
+    > npm install dotenv-webpack 
+    Add code to webpack.config.js:
+        const Dotenv = require('dotenv-webpack');
+        plugins: [new Dotenv()]
+    Use ${process.env.WEATHER_API_KEY} in index.js 
+    Create .env file.
